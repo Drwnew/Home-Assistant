@@ -1,0 +1,24 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Already configured device"
+        },
+        "error": {
+            "cannot_connect": "Cannot connect",
+            "invalid_host": "Invalid host",
+            "unknown": "Unknown error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "device_name": "Device name",
+                    "device_id": "Device id",
+                    "host": "Host",
+                    "port": "Port",
+                    "slave_id": "Slave id",
+                    "count_of_coils": "Count of coils"
+                }
+            }
+        }
+   }
+}

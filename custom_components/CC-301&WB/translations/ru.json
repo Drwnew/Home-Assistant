@@ -1,0 +1,24 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Устройство уже добавлено"
+        },
+        "error": {
+            "cannot_connect": "Не удалось подключиться",
+            "invalid_host": "Неверный адрес хоста",
+            "unknown": "Неизвестная ошибка"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "device_name": "Наименование",
+                    "device_id": "ID счётчика",
+                    "host": "Адрес хоста",
+                    "port": "Порт",
+                    "slave_id": "ID реле",
+                    "count_of_coils": "Количество дискретных выходов"
+                }
+            }
+        }
+   }
+}
