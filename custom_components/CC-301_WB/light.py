@@ -44,14 +44,14 @@ class ModbusSwitch(LightEntity):
         """Return true if light is on."""
         return self._state
 
-    async def async_turn_on(self, **kwargs: Any) -> None:
+    def turn_on(self, **kwargs: Any) -> None:
         """Instruct the light to turn on."""
-        await self._switcher.turn_on(self._coil)
+        self._switcher.turn_on(self._coil)
         self._state = True
 
-    async def async_turn_off(self, **kwargs: Any) -> None:
+    def turn_off(self, **kwargs: Any) -> None:
         """Instruct the light to turn off."""
-        await self._switcher.turn_off(self._coil)
+        self._switcher.turn_off(self._coil)
         self._state = False
 
     def update(self) -> None:

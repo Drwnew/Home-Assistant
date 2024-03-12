@@ -10,13 +10,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     new_devices = []
     device = hub.devices[0]
-    new_devices.append(ElectricMeter(device, device._electric_meter.summary_power, "summary_power"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.first_phase_power, "first_phase_power"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.second_phase_power, "second_phase_power"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.third_phase_power, "third_phase_power"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.first_phase_voltage, "first_phase_voltage"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.second_phase_voltage, "second_phase_voltage"))
-    new_devices.append(ElectricMeter(device, device._electric_meter.third_phase_voltage, "third_phase_voltage"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.summary_power, "summary_power"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.first_phase_power, "first_phase_power"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.second_phase_power, "second_phase_power"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.third_phase_power, "third_phase_power"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.first_phase_voltage, "first_phase_voltage"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.second_phase_voltage, "second_phase_voltage"))
+    new_devices.append(ElectricMeter(device, device.electric_meter.third_phase_voltage, "third_phase_voltage"))
 
     if new_devices:
         async_add_entities(new_devices)
@@ -51,7 +51,7 @@ class ElectricMeter(Entity):
 
     @property
     def available(self):
-        """Return True if roller and hub is available"""
+        """Return True if meter is available"""
         return self._device.electric_meter.available
 
     async def async_added_to_hass(self):

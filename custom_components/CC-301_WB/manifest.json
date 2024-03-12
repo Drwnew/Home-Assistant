@@ -1,11 +1,11 @@
 {
   "domain": "CC-301_WB",
-  "name": "CC-301_WB",
+  "name": "CC-301&WB",
   "config_flow": true,
+  "codeowners": [],
   "dependencies": [],
   "iot_class": "local_push",
   "requirements": [],
-  "ssdp": [],
-  "version": "1.0",
-  "zeroconf": []
+  "documentation": "",
+  "version": "0.1.0"
 }

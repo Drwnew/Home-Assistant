@@ -4,8 +4,10 @@ import threading
 from typing import List
 import serial
 from subprocess import run
+from .const import TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class ElectricMeter:
     """Electric Meter Gran Electro CC-301"""
@@ -66,7 +68,7 @@ class ElectricMeter:
             packet.append(num)
             command_line += str(num) + " "
 
-        result = run(f"'./custom_components/CC-301/CRC' {command_line}", shell=True, capture_output=True)
+        result = run(f"'./custom_components/CC-301_WB/CRC' {command_line}", shell=True, capture_output=True)
         result = result.stdout.decode()
         packet.append(int("0x" + result[5:7], 16))
         packet.append(int("0x" + result[3:5], 16))
@@ -75,7 +77,7 @@ class ElectricMeter:
 
     def get_data(self, packet) -> bytes:
         """Sends a request and receive a response"""
-        ser = serial.serial_for_url(f"socket://{self._host}:{self._port}")
+        ser = serial.serial_for_url(f"socket://{self._host}:{self._port}", timeout=TIMEOUT)
 
         try:
             ser.write(packet)
@@ -103,7 +105,7 @@ class ElectricMeter:
         for num in response[:76]:
             command_line += str(num) + " "
 
-        result = run(f"'./custom_components/CC-301/CRC' {command_line}", shell=True, capture_output=True)
+        result = run(f"'./custom_components/CC-301_WB/CRC' {command_line}", shell=True, capture_output=True)
         result = result.stdout.decode()
 
         first_crc_response_byte = "0x" + result[5:7]
@@ -122,9 +124,7 @@ class ElectricMeter:
         """Update electric meter state"""
         try:
             prepared_command = self.prepare_command()
-            self._mutex.acquire()
             response = self.get_data(prepared_command)
-            self._mutex.release()
 
             if self.check_response(response) and self.check_crc(response):
                 unpacked_data = self.unpack_data(response)
@@ -139,5 +139,5 @@ class ElectricMeter:
                 self._available = True
         except Exception as exc:
             _LOGGER.error(exc)
-            self._available = False
+            # self._available = False
 

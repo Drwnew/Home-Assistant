@@ -6,18 +6,15 @@ import threading
 from typing import List, Callable
 from homeassistant.core import HomeAssistant
 from .electric_meter import ElectricMeter
-from .const import SCAN_INTERVAL_METER, SCAN_INTERVAL_SWITCH
+from .const import SCAN_INTERVAL, TIMEOUT
 from .modbus_switcher import ModbusSwitcher
-import sched
-import time
-from threading import Timer
 
 _LOGGER = logging.getLogger(__name__)
 
 class Hub:
 
     def __init__(self, hass: HomeAssistant, device_name: str, device_id: str, host: str, port: str, slave_id: int, count_of_coils: int) -> None:
-        mutex = threading.Lock()
+        self._mutex = threading.Lock()
         self._hass = hass
         self._name = f'{device_name}_{host}'
         self._id = host.lower()
@@ -27,7 +24,7 @@ class Hub:
                   device_id,
                   host,
                   port,
-                  mutex),
+                  self._mutex),
 
             ModbusDevice(f"modbus_switcher_{self._id}",
                          f"{device_name}",
@@ -35,9 +32,11 @@ class Hub:
                          host,
                          port,
                          count_of_coils,
-                         mutex),
+                         self._mutex),
         ]
         self.online = True
+        self._loop = asyncio.get_event_loop()
+        self._loop.create_task(self.update())
 
 
     @property
@@ -50,6 +49,16 @@ class Hub:
         """Return hub id."""
         return self._id
 
+    async def update(self):
+        while True:
+            await asyncio.sleep(SCAN_INTERVAL)
+            for device in self.devices:
+                try:
+                    self._mutex.acquire(timeout=TIMEOUT)
+                    await device.update()
+                    self._mutex.release()
+                except Exception as exc:
+                    _LOGGER.error(exc)
 
 
 class Meter:
@@ -106,9 +115,8 @@ class Meter:
 
     async def update(self) -> None:
         """Update electric meter sensors states"""
-        self._electric_meter.update()
-        await asyncio.sleep(SCAN_INTERVAL_METER)
-        await self.update()
+        await self._loop.run_in_executor(None, self._electric_meter.update)
+        self.publish_updates()
 
 
 class ModbusDevice:
@@ -126,8 +134,6 @@ class ModbusDevice:
         self._manufacturer = "Wirenboard"
         self._switches = []
         self._callbacks = set()
-        self._loop = asyncio.get_event_loop()
-        self._loop.create_task(self.update())
 
     @property
     def model(self) -> str:
@@ -182,5 +188,3 @@ class ModbusDevice:
         self._modbus_switcher.update()
         for light in self._switches:
             light.async_schedule_update_ha_state(True)
-        await asyncio.sleep(SCAN_INTERVAL_SWITCH)
-        await self.update()

@@ -32,12 +32,11 @@ async def validate_input(data: dict) -> dict[str, Any]:
     """ Raise InvalidHost exception if ping failed"""
     if not ping(data["host"]):
         raise InvalidHost
-    return {"title": data["host"]}
+    return {"title": f'CC-301&WB {data["host"]}'}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
-    # Pick one of the available connection classes in homeassistant/config_entries.py
     # This tells HA if it should be asking for updates, or it'll be notified of updates
     # automatically. This connection class uses PUSH, as the hub will notify HA of changes.
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
